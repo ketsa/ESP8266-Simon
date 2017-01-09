@@ -1,6 +1,6 @@
 # Project : ESP8266 - MICROPYTHON - MINI-SIMON
 # Author : Mathias Chapuis
-# Date : Janvier 2017
+# Date : Jan. 2017
 
 import machine; # for Pin and ? // might replace with from machine import...
 import time;    # for PWM and timers, delays..
@@ -18,17 +18,18 @@ beeper = machine.PWM(machine.Pin(14)); # beeper on pin 14
 buttonred = machine.Pin(12, machine.Pin.IN, machine.Pin.PULL_UP);
 buttonblue = machine.Pin(13, machine.Pin.IN, machine.Pin.PULL_UP);
 buttongreen = machine.Pin(2, machine.Pin.IN, machine.Pin.PULL_UP);
-buttonyellow = machine.Pin(15, machine.Pin.IN, machine.Pin.PULL_UP); # Funny micropython doesn't complain about PULL_UP. Doesnt work anyway, its pulled down and active HIGH.
+buttonyellow = machine.Pin(15, machine.Pin.IN, machine.Pin.PULL_UP); 
+# Funny micropython doesn't complain about pin 15 declared PULL_UP. Doesnt work anyway, its pulled down and active HIGH.
 
-melody = [100, 150, 200, 232, 262, 294, 330, 349, 392, 440, 494, 523, 900]; # maybe a melody later
+melody = [100, 150, 200, 232, 262, 294, 330, 349, 392, 440, 494, 523, 900]; # maybe add melody later
 notes = [216, 433, 649, 866];
 rndlist=[]; # init a list for our random numbers.
 btlist=[]; # and a list of buttonpresses.
 
 lost = False;
 
+#beeper = machine.PWM(machine.Pin(14, machine.Pin.OUT), freq=440, duty=512); 
 
-#beeper = machine.PWM(machine.Pin(14, machine.Pin.OUT), freq=440, duty=512);
 
 def startupsequence():
     beeper = machine.PWM(machine.Pin(14));
@@ -60,7 +61,7 @@ def startupsequence():
             greenled.value(0);
         if (herz > 750 and herz < 999):
             yellowled.value(0);
-    beeper.duty(0);
+    beeper.duty(0); # I still have some strange noise from the beeper even when duty=0...
 
 def switchledon(led):
     if led==0:
@@ -89,12 +90,12 @@ def randomlist(x):
 
 def playrandomlist(randlist):
     for note in randlist:
-        switchledon(note); # allumer la bonne led
+        switchledon(note); 
         beeper.freq(notes[note]);
         beeper.duty(500);
         time.sleep(0.5);
         beeper.duty(0);
-        switchledoff(note); # eteindre la bonne led
+        switchledoff(note);
         time.sleep(0.2);
 
 def playnote(note):
@@ -119,15 +120,14 @@ def comparelists():
 
     print(lost);
 
-cod = uos.urandom(4); #get some true random number from uos.urandom because urandom.getrandbits slways give the same sequence...
+cod = uos.urandom(4); #get some random number from uos.urandom because urandom.getrandbits give the same sequence every reset...
 decod = ustruct.unpack('BBBB', cod); # decode bytes into tuple of numbers.
 urandom.seed(decod[0]); # seed urandom with a random number from uos.urandom...
-# SHRINK 3 PREVIOUS LINES TO 1.
+# Could SHRINK 3 PREVIOUS LINES TO 1.
 
 startupsequence();
 time.sleep(1);
 
-#times = 0;
 randomlist(1);
 playrandomlist(rndlist);
 oldstate = getbuttonstates();
@@ -173,13 +173,13 @@ while not lost:
             beeper.duty(0);
             oldstate[2] = buttongreen.value();
 
-    if buttonyellow.value()!=oldstate[3]:       # THIS ONE IS ACTIVE LOW
+    if buttonyellow.value()!=oldstate[3]:       # Pin 15 : This one is active LOW.
         time.sleep_ms(50); # lazy debounce
-        if buttonyellow.value() == 1:           # THIS ONE IS ACTIVE LOW
+        if buttonyellow.value() == 1:           # ACTIVE LOW
             switchledon(3);
             playnote(3);
             oldstate[3]=buttonyellow.value();
-        if buttonyellow.value() == 0:          # THIS ONE IS ACTIVE LOW
+        if buttonyellow.value() == 0:          # ACTIVE LOW
             btlist.append(3);
             comparelists();
             switchledoff(3);
@@ -200,6 +200,6 @@ if lost:
     time.sleep(1);
     machine.reset();
 
-# rndlist.append(str(urandom.getrandbits(2))) # append a 0-3 random number to list
+# add :  several modes, speed, keep longest streak ? ...
 
-print("LOST - LOST - LOST - LOST - LOST - LOST - LOST - LOST - LOST - LOST");
+
