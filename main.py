@@ -11,11 +11,11 @@ redled = machine.Pin(5, machine.Pin.OUT);
 blueled = machine.Pin(4, machine.Pin.OUT);
 greenled = machine.Pin(0, machine.Pin.OUT);
 yellowled = machine.Pin(16, machine.Pin.OUT);
-#yellowled.value(0); # fucking pin 16 starts HIGH...
+#yellowled.value(0); # fucking pin 16 starts HIGH ?
 
 beeper = machine.PWM(machine.Pin(14)); # beeper on pin 14
 
-buttonred = machine.Pin(12, machine.Pin.IN, machine.Pin.PULL_UP);
+buttonred = machine.Pin(12, machine.Pin.IN, machine.Pin.PULL_UP); # Buttons
 buttonblue = machine.Pin(13, machine.Pin.IN, machine.Pin.PULL_UP);
 buttongreen = machine.Pin(2, machine.Pin.IN, machine.Pin.PULL_UP);
 buttonyellow = machine.Pin(15, machine.Pin.IN, machine.Pin.PULL_UP); 
@@ -84,7 +84,6 @@ def switchledoff(led):
         yellowled(0);
 
 def randomlist(x):
-    #rndlist.clear();
     for i in range(x):
         rndlist.append(urandom.getrandbits(2));
 
